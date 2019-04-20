@@ -5,7 +5,7 @@ const URLBASE = (VERSION === 2) ? APISERVER + '/v2' : APISERVER
 function query(ep, params, get = false) {
   let url = new URL(URLBASE + ep);
   let headers = new Headers({
-    'x-app-name': `panlex-language-picker/0.0.0`,
+    'x-app-name': `panlex-language-picker/1.0.0`,
     'content-type': 'application/json',
   });
   return (fetch(url, {
@@ -33,10 +33,6 @@ class PanLexLanguagePicker extends HTMLElement {
         background-color: white;
       }
       
-      panlex-language-picker li:hover {
-        background-color: lightgrey;
-      }
-
       panlex-language-picker li > div {
         display: flex;
         flex-direction: row;
@@ -70,6 +66,7 @@ class PanLexLanguagePicker extends HTMLElement {
         response.suggest.forEach(s => {
           let li = document.createElement("li");
           li.dataset.id = s.id;
+          li.dataset.uid = s.uid;
           li.dataset.name = s.trans[0].txt;
           li.addEventListener("click", this.clickSuggestion.bind(this));
           li.innerHTML = `
@@ -96,7 +93,8 @@ class PanLexLanguagePicker extends HTMLElement {
   }
 
   clickSuggestion(e) {
-    this.setAttribute("selected-lv", e.currentTarget.dataset.id);
+    this.dataset["lv"] = e.currentTarget.dataset.id;
+    this.dataset["uid"] = e.currentTarget.dataset.uid;
     this.input.value = e.currentTarget.dataset.name;
     this.lngList.innerHTML = "";
   }
