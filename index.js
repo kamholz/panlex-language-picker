@@ -42,7 +42,8 @@ class PanLexLanguagePicker extends HTMLElement {
     `
     this.input = document.createElement("input");
     this.input.type = "text";
-    this.input.addEventListener("input", this.debouncedGetSuggestions.bind(this))
+    this.input.addEventListener("input", this.debouncedGetSuggestions.bind(this));
+    this.input.value = (this.attributes.value && this.attributes.value.value) || "";
     this.appendChild(this.input);
     this.lngList = document.createElement("ul");
     this.appendChild(this.lngList);
