@@ -13,14 +13,18 @@ That's it.
 
 ## Usage
 
-The Javascript file defines a new custom element:
-`<panlex-language-picker></panlex-language-picker>`
+The Javascript file defines a new customized `input` element:
+`<input type="text" is="panlex-language-picker"></input>`
 
-It has no attributes that need to be set. When a language is selected by the user, the `data-lv` attribute is set to the PanLex Language Variety id (e.g. "187" for English), and the `data-uid` attribute is set to the PanLex Language Variety UID (e.g. "eng-000" for English), which can then be read as needed.
+`type` should be set to `"text"`. `value` can be set if an initial value is needed.
+
+When a language is selected by the user, the `data-lv` attribute is set to the PanLex Language Variety ID (e.g. "187" for English), the `data-uid` attribute is set to the PanLex Language Variety UID (e.g. "eng-000" for English), and a `language-select` event is fired, which can be listened for.
 
 ### Why is it so ugly?
 
 It's styled as minimally as necessary to make it work, on the principle that implementers will style it themselves. This is also why it's not implemented with a shadow-dom, so external stylesheets will be able to take effect.
+
+When the component is added to the DOM, it is wrapped in `<div class="panlex-language-picker"></div>` (so the dropdown menu will display properly). The easiest way to style it is to work from this class.
 
 ## Contributing
 
@@ -33,6 +37,8 @@ It's styled as minimally as necessary to make it work, on the principle that imp
 ## History
 
 1.0.0: Initial release
+1.2.0: Added ability to set initial value
+2.0.0: Switched to custom `<input>` component instead of entirely new componenent, added event firing
 
 ## License
 
