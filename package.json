@@ -1,6 +1,6 @@
 {
   "name": "panlex-language-picker",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Super customizable Web Component to select a PanLex language variety",
   "main": "index.js",
   "scripts": {
