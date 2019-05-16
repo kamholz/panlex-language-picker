@@ -5,7 +5,7 @@ const URLBASE = (VERSION === 2) ? APISERVER + '/v2' : APISERVER
 function query(ep, params, get = false) {
   let url = new URL(URLBASE + ep);
   let headers = new Headers({
-    'x-app-name': `panlex-language-picker/1.1.0`,
+    'x-app-name': `panlex-language-picker/2.1.0`,
     'content-type': 'application/json',
   });
   return (fetch(url, {
@@ -44,6 +44,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
     `
     this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
     this.lngList = document.createElement("ul");
+    this.lngList.className = this.getAttribute("list-class") || "";
   }
 
   connectedCallback() {
@@ -53,7 +54,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
       this.insertAdjacentElement("afterend", this.lngList);
     }
   }
-  
+
   debounce(func, delay) {
     return (args) => {
       let previousCall = this.lastCall;
@@ -71,6 +72,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
         this.lngList.innerHTML = "";
         response.suggest.forEach(s => {
           let li = document.createElement("li");
+          li.className = this.getAttribute("list-item-class") || "";
           li.dataset.id = s.id;
           li.dataset.uid = s.uid;
           li.dataset.name = s.trans[0].txt;
@@ -107,4 +109,4 @@ class PanLexLanguagePicker extends HTMLInputElement {
   }
 }
 
-window.customElements.define("panlex-language-picker", PanLexLanguagePicker, {extends: "input"});
+window.customElements.define("panlex-language-picker", PanLexLanguagePicker, { extends: "input" });
