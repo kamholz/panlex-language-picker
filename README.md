@@ -26,6 +26,8 @@ It's styled as minimally as necessary to make it work, on the principle that imp
 
 When the component is added to the DOM, it is wrapped in `<div class="panlex-language-picker"></div>` (so the dropdown menu will display properly). The easiest way to style it is to work from this class.
 
+The attributes `list-class` and `list-item-class` can also be set to specify the class of the dropdown menu and its items, respectively.
+
 ## Contributing
 
 1. Fork it!
