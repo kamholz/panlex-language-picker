@@ -26,7 +26,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
       .panlex-language-picker {
         display: inline-block;
       }
-      
+
       .panlex-language-picker > ul {
         padding: unset;
         margin: unset;
@@ -34,7 +34,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
         position: absolute;
         background-color: white;
       }
-      
+
       .panlex-language-picker li > div {
         display: flex;
         flex-direction: row;
@@ -42,9 +42,12 @@ class PanLexLanguagePicker extends HTMLInputElement {
       }
     </style>
     `
-    this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
     this.lngList = document.createElement("ul");
     this.lngList.className = this.getAttribute("list-class") || "";
+    this.lastValue = this.value;
+
+    this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
+    document.addEventListener("click", () => this.closeWithValue(this.lastValue));
   }
 
   connectedCallback() {
@@ -103,9 +106,16 @@ class PanLexLanguagePicker extends HTMLInputElement {
   clickSuggestion(e) {
     this.dataset["lv"] = e.currentTarget.dataset.id;
     this.dataset["uid"] = e.currentTarget.dataset.uid;
-    this.value = e.currentTarget.dataset.name;
-    this.lngList.innerHTML = "";
+    this.closeWithValue(e.currentTarget.dataset.name);
     this.dispatchEvent(new Event("language-select"));
+    e.stopPropagation();
+  }
+
+  closeWithValue(value) {
+    if (this.lngList.children.length) {
+      this.value = this.lastValue = value;
+      this.lngList.innerHTML = "";
+    }
   }
 }
 
