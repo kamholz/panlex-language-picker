@@ -5,7 +5,7 @@ const URLBASE = (VERSION === 2) ? APISERVER + '/v2' : APISERVER
 function query(ep, params, get = false) {
   let url = new URL(URLBASE + ep);
   let headers = new Headers({
-    'x-app-name': `panlex-language-picker/2.1.0`,
+    'x-app-name': `panlex-language-picker/2.2.0`,
     'content-type': 'application/json',
   });
   return (fetch(url, {
