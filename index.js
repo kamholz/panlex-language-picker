@@ -47,7 +47,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
     this.lastValue = this.value;
 
     this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
-    document.addEventListener("click", () => this.closeWithValue(this.lastValue));
+    document.addEventListener("click", () => this.closeIfOpen());
   }
 
   connectedCallback() {
@@ -104,17 +104,21 @@ class PanLexLanguagePicker extends HTMLInputElement {
   }
 
   clickSuggestion(e) {
-    this.dataset["lv"] = e.currentTarget.dataset.id;
-    this.dataset["uid"] = e.currentTarget.dataset.uid;
+    this.dataset.lv = e.currentTarget.dataset.id;
+    this.dataset.uid = e.currentTarget.dataset.uid;
     this.closeWithValue(e.currentTarget.dataset.name);
     this.dispatchEvent(new Event("language-select"));
     e.stopPropagation();
   }
 
   closeWithValue(value) {
+    this.value = this.lastValue = value;
+    this.lngList.innerHTML = "";
+  }
+
+  closeIfOpen() {
     if (this.lngList.children.length) {
-      this.value = this.lastValue = value;
-      this.lngList.innerHTML = "";
+      this.closeWithValue(this.lastValue);
     }
   }
 }
