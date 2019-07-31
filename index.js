@@ -5,7 +5,7 @@ const URLBASE = (VERSION === 2) ? APISERVER + '/v2' : APISERVER
 function query(ep, params, get = false) {
   let url = new URL(URLBASE + ep);
   let headers = new Headers({
-    'x-app-name': `panlex-language-picker/2.1.0`,
+    'x-app-name': `panlex-language-picker/2.2.0`,
     'content-type': 'application/json',
   });
   return (fetch(url, {
@@ -26,7 +26,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
       .panlex-language-picker {
         display: inline-block;
       }
-      
+
       .panlex-language-picker > ul {
         padding: unset;
         margin: unset;
@@ -34,7 +34,7 @@ class PanLexLanguagePicker extends HTMLInputElement {
         position: absolute;
         background-color: white;
       }
-      
+
       .panlex-language-picker li > div {
         display: flex;
         flex-direction: row;
@@ -42,9 +42,12 @@ class PanLexLanguagePicker extends HTMLInputElement {
       }
     </style>
     `
-    this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
     this.lngList = document.createElement("ul");
     this.lngList.className = this.getAttribute("list-class") || "";
+    this.lastValue = this.value;
+
+    this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
+    document.addEventListener("click", () => this.closeIfOpen());
   }
 
   connectedCallback() {
@@ -101,11 +104,22 @@ class PanLexLanguagePicker extends HTMLInputElement {
   }
 
   clickSuggestion(e) {
-    this.dataset["lv"] = e.currentTarget.dataset.id;
-    this.dataset["uid"] = e.currentTarget.dataset.uid;
-    this.value = e.currentTarget.dataset.name;
-    this.lngList.innerHTML = "";
+    this.dataset.lv = e.currentTarget.dataset.id;
+    this.dataset.uid = e.currentTarget.dataset.uid;
+    this.closeWithValue(e.currentTarget.dataset.name);
     this.dispatchEvent(new Event("language-select"));
+    e.stopPropagation();
+  }
+
+  closeWithValue(value) {
+    this.value = this.lastValue = value;
+    this.lngList.innerHTML = "";
+  }
+
+  closeIfOpen() {
+    if (this.lngList.children.length) {
+      this.closeWithValue(this.lastValue);
+    }
   }
 }
 
