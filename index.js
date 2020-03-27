@@ -1,19 +1,32 @@
-const VERSION = 2
-const APISERVER = 'https://api.panlex.org'
-const URLBASE = (VERSION === 2) ? APISERVER + '/v2' : APISERVER
+const VERSION = 2;
+const APISERVER = "https://api.panlex.org";
+const URLBASE = VERSION === 2 ? APISERVER + "/v2" : APISERVER;
+
+const validIncludes = new Set([
+  "expr_count",
+  "grp",
+  "meaning",
+  "mutable",
+  "name_expr",
+  "region_expr",
+  "region_expr_langvar",
+  "region_expr_txt",
+  "script_expr",
+  "script_expr_langvar",
+  "script_expr_txt"
+]);
 
 function query(ep, params, get = false) {
   let url = new URL(URLBASE + ep);
   let headers = new Headers({
-    'x-app-name': `panlex-language-picker/2.2.0`,
-    'content-type': 'application/json',
+    "x-app-name": `panlex-language-picker/2.3.0`,
+    "content-type": "application/json"
   });
-  return (fetch(url, {
-    method: 'POST',
+  return fetch(url, {
+    method: "POST",
     headers,
-    body: JSON.stringify(params),
-  }).then((response) => response.json()));
-
+    body: JSON.stringify(params)
+  }).then(response => response.json());
 }
 
 class PanLexLanguagePicker extends HTMLInputElement {
@@ -41,11 +54,15 @@ class PanLexLanguagePicker extends HTMLInputElement {
         justify-content: space-between;
       }
     </style>
-    `
+    `;
     this.lngList = document.createElement("ul");
     this.lngList.className = this.getAttribute("list-class") || "";
     this.lastValue = this.value;
-
+    this.include =
+      this.getAttribute("include") &&
+      this.getAttribute("include")
+        .split(" ")
+        .filter(inc => validIncludes.has(inc));
     this.addEventListener("input", this.debouncedGetSuggestions.bind(this));
     document.addEventListener("click", () => this.closeIfOpen());
   }
@@ -59,25 +76,28 @@ class PanLexLanguagePicker extends HTMLInputElement {
   }
 
   debounce(func, delay) {
-    return (args) => {
+    return args => {
       let previousCall = this.lastCall;
       this.lastCall = Date.now();
-      if (previousCall && ((this.lastCall - previousCall) <= delay)) {
+      if (previousCall && this.lastCall - previousCall <= delay) {
         clearTimeout(this.lastCallTimer);
       }
       this.lastCallTimer = setTimeout(func, delay, args);
-    }
+    };
   }
 
   getSuggestions(txt) {
-    query("/suggest/langvar", { "txt": txt, "pref_trans_langvar": 187 }).then((response) => {
+    query("/suggest/langvar", {
+      txt: txt,
+      pref_trans_langvar: 187,
+      include: this.include
+    }).then(response => {
       if (response.suggest) {
         this.lngList.innerHTML = "";
         response.suggest.forEach(s => {
           let li = document.createElement("li");
           li.className = this.getAttribute("list-item-class") || "";
-          li.dataset.id = s.id;
-          li.dataset.uid = s.uid;
+          Object.keys(s).forEach(k => k !== "trans" && (li.dataset[k] = s[k]));
           li.dataset.name = s.trans[0].txt;
           li.addEventListener("click", this.clickSuggestion.bind(this));
           li.innerHTML = `
@@ -90,11 +110,14 @@ class PanLexLanguagePicker extends HTMLInputElement {
             </span>
           </div>
           <div>
-            ${s.trans.slice(1).map(tran => tran.txt).join(' — ') || "&nbsp;"}
+            ${s.trans
+              .slice(1)
+              .map(tran => tran.txt)
+              .join(" — ") || "&nbsp;"}
           </div>
           `;
           this.lngList.appendChild(li);
-        })
+        });
       }
     });
   }
@@ -104,8 +127,9 @@ class PanLexLanguagePicker extends HTMLInputElement {
   }
 
   clickSuggestion(e) {
-    this.dataset.lv = e.currentTarget.dataset.id;
-    this.dataset.uid = e.currentTarget.dataset.uid;
+    Object.keys(e.currentTarget.dataset).forEach(
+      k => (this.dataset[k] = e.currentTarget.dataset[k])
+    );
     this.closeWithValue(e.currentTarget.dataset.name);
     this.dispatchEvent(new Event("language-select"));
     e.stopPropagation();
@@ -123,4 +147,6 @@ class PanLexLanguagePicker extends HTMLInputElement {
   }
 }
 
-window.customElements.define("panlex-language-picker", PanLexLanguagePicker, { extends: "input" });
+window.customElements.define("panlex-language-picker", PanLexLanguagePicker, {
+  extends: "input"
+});
