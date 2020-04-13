@@ -44,6 +44,7 @@ The attributes `list-class` and `list-item-class` can also be set to specify the
 * 1.2.0: Added ability to set initial value
 * 2.0.0: Switched to custom `<input>` component instead of entirely new componenent, added event firing
 * 2.3.0: Added ability to `include` additional data.
+* 2.3.1: Fixed bug where if component is used without `include` the API request fails
 
 ## License
 
